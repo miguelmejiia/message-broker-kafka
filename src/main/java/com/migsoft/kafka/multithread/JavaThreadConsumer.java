@@ -26,12 +26,14 @@ public class JavaThreadConsumer extends Thread{
     @Override
     public void run() {
         consumer.subscribe(Arrays.asList("java-topic"));
-        while (!closed.get()) {
+
             try {
-                ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofMillis(100));
-                for (ConsumerRecord<String, String> consumerRecord: consumerRecords) {
-                    log.info("Offset = {}, Partition = {}, Key = {}, Value = {}", consumerRecord.offset(), consumerRecord.partition(),
+                while (!closed.get()) {
+                    ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofMillis(100));
+                    for(ConsumerRecord<String, String> consumerRecord: consumerRecords) {
+                        log.info("Offset = {}, Partition = {}, Key = {}, Value = {}", consumerRecord.offset(), consumerRecord.partition(),
                             consumerRecord.key(), consumerRecord.value());
+                    }
                 }
             } catch (WakeupException wex) {
                 if(!closed.get()) {
@@ -40,7 +42,6 @@ public class JavaThreadConsumer extends Thread{
             } finally {
                 consumer.close();
             }
-        }
     }
 
     public void shutDown() {
