@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Properties;
 
 public class TransactionalProducer {
-    public static final Logger log = LoggerFactory.getLogger(JavaProducer.class);
+    public static final Logger log = LoggerFactory.getLogger(TransactionalProducer.class);
 
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
