@@ -22,7 +22,7 @@ public class JavaConsumer {
         props.setProperty("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.setProperty("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 
-        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(props)){
+        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props)){
             consumer.subscribe(Arrays.asList("java-topic"));
             while(true){
                 ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofMillis(100));
