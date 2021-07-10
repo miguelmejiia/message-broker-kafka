@@ -23,13 +23,23 @@ public class TransactionalProducer {
         props.put("linger.ms", "5");
 
         try (Producer<String, String> producer = new KafkaProducer<>(props)){
-            producer.initTransactions();
-            producer.beginTransaction();
-            for (int i = 0; i<1000000; i++) {
-                producer.send(new ProducerRecord<String, String>("java-topic", String.valueOf(i), "java-value"));
+            try {
+                producer.initTransactions();
+                producer.beginTransaction();
+                for (int i = 0; i<100000; i++) {
+                    producer.send(new ProducerRecord<String, String>("java-topic", String.valueOf(i), "java-value"));
+                    // Uncomment to simulate a transaction error
+                    if(i == 50000){
+                        throw new Exception("Unexpected exception");
+                    }
+                }
+                producer.commitTransaction();
+                producer.flush();
+            } catch (Exception e) {
+                log.error("Errpr ", e);
+                producer.abortTransaction();
             }
-            producer.commitTransaction();
-            producer.flush();
+
         }
         log.info("Processing time = {} ms", (System.currentTimeMillis() - startTime));
 
