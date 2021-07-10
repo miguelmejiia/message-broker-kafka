@@ -23,9 +23,12 @@ public class TransactionalProducer {
         props.put("linger.ms", "5");
 
         try (Producer<String, String> producer = new KafkaProducer<>(props)){
+            producer.initTransactions();
+            producer.beginTransaction();
             for (int i = 0; i<1000000; i++) {
                 producer.send(new ProducerRecord<String, String>("java-topic", String.valueOf(i), "java-value"));
             }
+            producer.commitTransaction();
             producer.flush();
         }
         log.info("Processing time = {} ms", (System.currentTimeMillis() - startTime));
