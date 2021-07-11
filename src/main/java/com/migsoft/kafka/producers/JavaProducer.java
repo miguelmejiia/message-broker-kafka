@@ -18,12 +18,12 @@ public class JavaProducer {
         props.put("bootstrap.servers", "localhost:9092"); // Broker to connect
         props.put("acks", "all"); // 0 - 1 - all
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer"); // key type (IntegerSerializer (ex))
-        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer"); // key type
+        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer"); // value type
         props.put("linger.ms", "5"); // key type
 
-        try (Producer<String, String> producer = new KafkaProducer<>(props)){
-            for (int i = 0; i<1000000; i++) {
-                producer.send(new ProducerRecord<String, String>("java-topic", String.valueOf(i), "java-value"));
+        try (Producer<String, String> producer = new KafkaProducer<>(props)) {
+            for (int i = 0; i < 100; i++) {
+                producer.send(new ProducerRecord<>("java-topic", String.valueOf(i), "java-value"));
             }
             producer.flush();
         }

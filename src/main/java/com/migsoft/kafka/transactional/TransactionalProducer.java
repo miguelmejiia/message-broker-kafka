@@ -1,6 +1,5 @@
 package com.migsoft.kafka.transactional;
 
-import com.migsoft.kafka.producers.JavaProducer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -22,16 +21,16 @@ public class TransactionalProducer {
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer"); // key type
         props.put("linger.ms", "5");
 
-        try (Producer<String, String> producer = new KafkaProducer<>(props)){
+        try (Producer<String, String> producer = new KafkaProducer<>(props)) {
             try {
                 producer.initTransactions();
                 producer.beginTransaction();
-                for (int i = 0; i<100000; i++) {
-                    producer.send(new ProducerRecord<String, String>("java-topic", String.valueOf(i), "java-value"));
+                for (int i = 0; i < 100000; i++) {
+                    producer.send(new ProducerRecord<>("java-topic", String.valueOf(i), "java-value"));
                     // Uncomment to simulate a transaction error
-                    if(i == 50000){
-                        throw new Exception("Unexpected exception");
-                    }
+                    //if(i == 50000){
+                    //    throw new Exception("Unexpected exception");
+                    //}
                 }
                 producer.commitTransaction();
                 producer.flush();
@@ -39,9 +38,7 @@ public class TransactionalProducer {
                 log.error("Errpr ", e);
                 producer.abortTransaction();
             }
-
         }
         log.info("Processing time = {} ms", (System.currentTimeMillis() - startTime));
-
     }
 }
