@@ -22,16 +22,13 @@ public class CallbackProducer {
         try (Producer<String, String> producer = new KafkaProducer<>(props)){
             for (int i = 0; i<10000; i++) {
                 producer.send(new ProducerRecord<>("java-topic", String.valueOf(i), "java-value"),
-                   new Callback() {
-                    // Callback - Executes when the message is delivered
-                    @Override
-                    public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-                        if(e != null) {
-                            log.info("There was an error {} ", e.getMessage());
-                        }
-                        log.info("Offset = {}, Partition {}, Topic {} ", recordMetadata.offset(), recordMetadata.partition(), recordMetadata.topic());
-                    }
-                });
+                     (recordMetadata, e) -> {
+                            if(e != null) {
+                                log.info("There was an error {} ", e.getMessage());
+                            }
+                            log.info("Offset = {}, Partition {}, Topic {} ", recordMetadata.offset(), recordMetadata.partition(), recordMetadata.topic());
+                     }
+                );
             }
             producer.flush();
         }
