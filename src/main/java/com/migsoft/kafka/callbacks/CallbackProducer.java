@@ -1,16 +1,14 @@
 package com.migsoft.kafka.callbacks;
 
 import com.migsoft.kafka.producers.JavaProducer;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
 public class CallbackProducer {
-    public static final Logger log = LoggerFactory.getLogger(JavaProducer.class);
+    public static final Logger log = LoggerFactory.getLogger(CallbackProducer.class);
 
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
@@ -22,8 +20,18 @@ public class CallbackProducer {
         props.put("linger.ms", "5");
 
         try (Producer<String, String> producer = new KafkaProducer<>(props)){
-            for (int i = 0; i<1000000; i++) {
-                producer.send(new ProducerRecord<>("java-topic", String.valueOf(i), "java-value"));
+            for (int i = 0; i<10000; i++) {
+                producer.send(new ProducerRecord<>("java-topic", String.valueOf(i), "java-value"),
+                   new Callback() {
+                    // Callback - Executes when the message is delivered
+                    @Override
+                    public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+                        if(e != null) {
+                            log.info("There was an error {} ", e.getMessage());
+                        }
+                        log.info("Offset = {}, Partition {}, Topic {} ", recordMetadata.offset(), recordMetadata.partition(), recordMetadata.topic());
+                    }
+                });
             }
             producer.flush();
         }
